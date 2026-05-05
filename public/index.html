@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lavamax — Punto de Venta</title>
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="login-body">
+
+  <!-- ── LOGIN ─────────────────────────────────────────────────────────────── -->
+  <div id="loginPage" class="login-container">
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="logo-icon">🧺</div>
+        <h1>Lavamax</h1>
+        <p>Sistema de Punto de Venta</p>
+      </div>
+      <form id="loginForm" autocomplete="off">
+        <div class="form-group">
+          <label for="usuario">Usuario</label>
+          <input type="text" id="usuario" placeholder="Ingresa tu usuario" autocomplete="username" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <input type="password" id="password" placeholder="Ingresa tu contraseña" autocomplete="current-password" required>
+        </div>
+        <div id="loginError" class="alert alert-danger hidden"></div>
+        <button type="submit" class="btn btn-primary btn-full btn-lg" style="margin-top:.5rem">Iniciar Sesión →</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── MAIN APP ───────────────────────────────────────────────────────────── -->
+  <div id="app" class="hidden">
+
+    <!-- Sidebar overlay (mobile) -->
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <span class="logo-icon-sm">🧺</span>
+        <span>Lavamax</span>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item active" data-page="dashboard">
+          <span class="nav-icon">📊</span> Inicio
+        </a>
+        <a href="#" class="nav-item" data-page="nuevo-ticket">
+          <span class="nav-icon">➕</span> Nuevo Ticket
+        </a>
+        <a href="#" class="nav-item" data-page="tickets">
+          <span class="nav-icon">🧾</span> Tickets
+        </a>
+        <a href="#" class="nav-item" data-page="reporte">
+          <span class="nav-icon">📈</span> Reportes
+        </a>
+        <div class="nav-separator admin-only hidden"></div>
+        <a href="#" class="nav-item admin-only hidden" data-page="prendas">
+          <span class="nav-icon">👕</span> Prendas y Precios
+        </a>
+        <a href="#" class="nav-item admin-only hidden" data-page="usuarios">
+          <span class="nav-icon">👥</span> Usuarios
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="user-avatar">👤</div>
+          <div>
+            <div id="sidebarNombre" class="user-name"></div>
+            <div id="sidebarRol" class="user-role"></div>
+          </div>
+        </div>
+        <button id="logoutBtn" class="btn-logout">Cerrar sesión</button>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main-content">
+      <div class="topbar">
+        <div class="topbar-left">
+          <button id="hamburgerBtn" class="hamburger-btn">
+            <span></span><span></span><span></span>
+          </button>
+          <h2 id="pageTitle">Inicio</h2>
+        </div>
+        <span id="topbarFecha" class="topbar-fecha"></span>
+      </div>
+
+      <!-- ── DASHBOARD ─────────────────────────────────────────────────────── -->
+      <section id="pageDashboard" class="page active">
+        <div class="stats-grid">
+          <div class="stat-card blue">
+            <div class="stat-icon">🧾</div>
+            <div class="stat-info">
+              <div class="stat-value" id="statTickets">0</div>
+              <div class="stat-label">Tickets hoy</div>
+            </div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-icon">💰</div>
+            <div class="stat-info">
+              <div class="stat-value" id="statVentas">$0</div>
+              <div class="stat-label">Ventas hoy</div>
+            </div>
+          </div>
+          <div class="stat-card teal">
+            <div class="stat-icon">✅</div>
+            <div class="stat-info">
+              <div class="stat-value" id="statCobrado">$0</div>
+              <div class="stat-label">Cobrado hoy</div>
+            </div>
+          </div>
+          <div class="stat-card orange">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-info">
+              <div class="stat-value" id="statPendiente">$0</div>
+              <div class="stat-label">Por cobrar</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <div class="card">
+            <div class="card-header">
+              <h3>Distribución por tipo de prenda (hoy)</h3>
+            </div>
+            <div id="tablaPorTipo" class="tabla-tipo"></div>
+          </div>
+          <div class="card">
+            <div class="card-header">
+              <h3>Últimos tickets</h3>
+              <button class="btn btn-sm btn-primary" onclick="navegarA('nuevo-ticket')">+ Nuevo</button>
+            </div>
+            <div id="ultimosTickets"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── NUEVO TICKET ───────────────────────────────────────────────────── -->
+      <section id="pageNuevo-ticket" class="page">
+        <div class="ticket-layout">
+          <div class="card ticket-form-card">
+            <div class="card-header"><h3>Datos del cliente</h3></div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Nombre del cliente</label>
+                <input type="text" id="tCliente" placeholder="Nombre (opcional)">
+              </div>
+              <div class="form-group">
+                <label>Teléfono</label>
+                <input type="text" id="tTelefono" placeholder="Teléfono (opcional)">
+              </div>
+            </div>
+
+            <div class="section-divider">Agregar prendas al ticket</div>
+            <div class="form-row agregar-row">
+              <div class="form-group">
+                <label>Tipo de prenda</label>
+                <select id="tPrenda">
+                  <option value="">Seleccionar...</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Modo</label>
+                <select id="tModo">
+                  <option value="kg">Por kg</option>
+                </select>
+              </div>
+              <div class="form-group" id="grupoKg">
+                <label>Kilogramos</label>
+                <input type="number" id="tKilos" placeholder="0" step="0.1" min="0">
+              </div>
+              <div class="form-group" id="grupoGramos">
+                <label>Gramos</label>
+                <input type="number" id="tGramos" placeholder="0" step="1" min="0" max="999">
+              </div>
+              <div class="form-group hidden" id="grupoPiezas">
+                <label>Piezas</label>
+                <input type="number" id="tPiezas" placeholder="0" step="1" min="1">
+              </div>
+              <div class="form-group precio-preview">
+                <label>Precio</label>
+                <div id="tPrecioKg" class="precio-display">—</div>
+              </div>
+              <div class="form-group">
+                <label>&nbsp;</label>
+                <button class="btn btn-primary" onclick="agregarPartida()">+ Agregar</button>
+              </div>
+            </div>
+
+            <!-- Tabla de partidas -->
+            <table class="tabla-partidas" id="tablaPartidas">
+              <thead>
+                <tr>
+                  <th>Tipo de prenda</th>
+                  <th>Modo</th>
+                  <th>Cantidad</th>
+                  <th>Precio</th>
+                  <th>Subtotal</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="bodyPartidas">
+                <tr id="emptyRow"><td colspan="6" class="empty-row">Sin prendas agregadas</td></tr>
+              </tbody>
+            </table>
+
+            <div class="form-group" style="margin-top:1rem">
+              <label>Observaciones</label>
+              <textarea id="tObs" rows="2" placeholder="Manchas especiales, instrucciones, etc."></textarea>
+            </div>
+          </div>
+
+          <!-- Resumen -->
+          <div class="ticket-resumen">
+            <div class="card resumen-card">
+              <div class="card-header"><h3>Resumen del ticket</h3></div>
+              <div id="resumenPartidas" class="resumen-lista"></div>
+              <div class="resumen-total">
+                <span>Total</span>
+                <span id="resumenTotal" class="total-amount">$0.00</span>
+              </div>
+              <div class="resumen-anticipo">
+                <div class="form-group" style="margin:0">
+                  <label>Anticipo (opcional)</label>
+                  <input type="number" id="tAnticipo" placeholder="0.00" step="0.5" min="0">
+                </div>
+                <div class="resumen-saldo-row">
+                  <span>Saldo pendiente:</span>
+                  <strong id="resumenSaldo" style="color:var(--amber)">$0.00</strong>
+                </div>
+              </div>
+              <div id="ticketError" class="alert alert-danger hidden"></div>
+              <div style="padding:0 1.5rem 1.5rem">
+                <button class="btn btn-success btn-full btn-lg" onclick="guardarTicket()">
+                  Guardar Ticket
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── TICKETS ────────────────────────────────────────────────────────── -->
+      <section id="pageTickets" class="page">
+        <div class="card">
+          <div class="card-header filtros-header">
+            <h3>Tickets</h3>
+            <div class="filtros">
+              <input type="date" id="fDesde" class="input-sm">
+              <input type="date" id="fHasta" class="input-sm">
+              <select id="fEstado" class="input-sm">
+                <option value="">Todos los estados</option>
+                <option value="pendiente">Pendiente</option>
+                <option value="en_proceso">En proceso</option>
+                <option value="listo">Listo</option>
+                <option value="entregado">Entregado</option>
+              </select>
+              <button class="btn btn-sm btn-primary" onclick="cargarTickets()">Buscar</button>
+            </div>
+          </div>
+          <div id="listaTickets" class="tabla-wrapper"></div>
+        </div>
+      </section>
+
+      <!-- ── REPORTE ────────────────────────────────────────────────────────── -->
+      <section id="pageReporte" class="page">
+        <div class="stats-grid">
+          <div class="stat-card blue">
+            <div class="stat-icon">🧾</div>
+            <div class="stat-info">
+              <div class="stat-value" id="rStatTickets">0</div>
+              <div class="stat-label">Tickets hoy</div>
+            </div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-icon">💰</div>
+            <div class="stat-info">
+              <div class="stat-value" id="rStatVentas">$0</div>
+              <div class="stat-label">Ventas hoy</div>
+            </div>
+          </div>
+          <div class="stat-card teal">
+            <div class="stat-icon">✅</div>
+            <div class="stat-info">
+              <div class="stat-value" id="rStatCobrado">$0</div>
+              <div class="stat-label">Cobrado hoy</div>
+            </div>
+          </div>
+        </div>
+        <div class="dashboard-grid">
+          <div class="card">
+            <div class="card-header"><h3>Ventas últimos 7 días</h3></div>
+            <div id="tablaSemana"></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Por tipo de prenda (hoy)</h3></div>
+            <div id="rTablaPorTipo"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── PRENDAS (admin) ────────────────────────────────────────────────── -->
+      <section id="pagePrendas" class="page admin-only hidden">
+        <div class="card">
+          <div class="card-header">
+            <h3>Tipos de prenda y precios</h3>
+            <button class="btn btn-sm btn-primary" onclick="modalPrenda()">+ Nueva prenda</button>
+          </div>
+          <div id="listaPrendas" class="tabla-wrapper"></div>
+        </div>
+      </section>
+
+      <!-- ── USUARIOS (admin) ───────────────────────────────────────────────── -->
+      <section id="pageUsuarios" class="page admin-only hidden">
+        <div class="card">
+          <div class="card-header">
+            <h3>Usuarios del sistema</h3>
+            <button class="btn btn-sm btn-primary" onclick="modalUsuario()">+ Nuevo usuario</button>
+          </div>
+          <div id="listaUsuarios" class="tabla-wrapper"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ── MODAL DETALLE TICKET ──────────────────────────────────────────────── -->
+  <div id="modalTicket" class="modal-overlay hidden">
+    <div class="modal modal-lg">
+      <div class="modal-header">
+        <h3 id="modalTicketTitulo">Detalle del Ticket</h3>
+        <button class="modal-close" onclick="cerrarModal('modalTicket')">✕</button>
+      </div>
+      <div id="modalTicketBody" class="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- ── MODAL PRENDA ───────────────────────────────────────────────────────── -->
+  <div id="modalPrendaEl" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalPrendaTitulo">Nueva prenda</h3>
+        <button class="modal-close" onclick="cerrarModal('modalPrendaEl')">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="prendaId">
+        <div class="form-group">
+          <label>Nombre de la prenda</label>
+          <input type="text" id="pNombre" placeholder="Ej: Ropa Blanca">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Precio por kg ($)</label>
+            <input type="number" id="pPrecioKg" placeholder="0.00" step="0.5" min="0">
+          </div>
+          <div class="form-group">
+            <label>Precio por pieza ($)</label>
+            <input type="number" id="pPrecioPieza" placeholder="0.00" step="0.5" min="0">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Modo de cobro</label>
+          <select id="pModoCobro">
+            <option value="kg">Solo por kg</option>
+            <option value="pieza">Solo por pieza</option>
+            <option value="ambos">Ambos (kg y pieza)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Descripción</label>
+          <input type="text" id="pDesc" placeholder="Descripción opcional">
+        </div>
+        <button class="btn btn-primary btn-full" onclick="guardarPrenda()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MODAL USUARIO ─────────────────────────────────────────────────────── -->
+  <div id="modalUsuarioEl" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Nuevo usuario</h3>
+        <button class="modal-close" onclick="cerrarModal('modalUsuarioEl')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Usuario (login)</label>
+          <input type="text" id="uUsuario" placeholder="usuario123">
+        </div>
+        <div class="form-group">
+          <label>Nombre completo</label>
+          <input type="text" id="uNombre" placeholder="Nombre completo">
+        </div>
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input type="password" id="uPassword" placeholder="Contraseña">
+        </div>
+        <div class="form-group">
+          <label>Rol</label>
+          <select id="uRol">
+            <option value="empleado">Empleado</option>
+            <option value="admin">Administrador</option>
+          </select>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="guardarUsuario()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── MODAL TICKET GUARDADO ─────────────────────────────────────────────── -->
+  <div id="modalExito" class="modal-overlay hidden">
+    <div class="modal modal-exito">
+      <div class="exito-icon">✅</div>
+      <h3>¡Ticket guardado!</h3>
+      <div id="exitoDetalle" class="exito-detalle"></div>
+      <div class="exito-actions">
+        <button class="btn btn-outline" onclick="imprimirTicket()">Imprimir</button>
+        <button class="btn btn-primary" onclick="nuevoTicketLimpio()">+ Nuevo ticket</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TOAST ──────────────────────────────────────────────────────────────── -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="/js/app.js"></script>
+</body>
+</html>

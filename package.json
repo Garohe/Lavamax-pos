@@ -1,0 +1,14 @@
+{
+  "name": "lavamax-pos",
+  "version": "2.0.0",
+  "description": "Sistema punto de venta - Lavandería Lavamax (Vercel + Neon)",
+  "scripts": {
+    "migrate": "node lib/migrate.js"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^0.9.0",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^17.4.2",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
