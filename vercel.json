@@ -1,8 +1,10 @@
 {
-  "buildCommand": "",
-  "outputDirectory": "public",
+  "functions": {
+    "api/**/*.js": {
+      "includeFiles": "lib/**"
+    }
+  },
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api/$1" }
-  ],
-  "excludeFiles": ["server.js", "database/**", "INICIAR.bat"]
+    { "source": "/((?!api/).*)", "destination": "/public/$1" }
+  ]
 }
